@@ -1,0 +1,8 @@
+package kernel
+version = 0.1.0
+
+main = KernelMain
+executable = kernel_main
+sourcedir = "src"
+builddir = "build"
+outputdir = "build/exec"

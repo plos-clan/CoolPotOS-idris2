@@ -1,0 +1,17 @@
+[package]
+name = "kernel"
+version = "0.1.0"
+edition = "2024"
+build = "build.rs"
+
+[lib]
+crate-type = ["staticlib", "rlib"]
+
+[[bin]]
+name = "kernel"
+path = "src/main.rs"
+
+[dependencies]
+limine = "=0.6.5"
+spin = { version = "=0.12.1", default-features = false, features = ["lock_api", "mutex", "spin_mutex"] }
+talc = "=5.0.4"
