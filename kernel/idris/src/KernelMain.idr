@@ -1,4 +1,7 @@
 module KernelMain
 
+import Trap
+
 main : IO ()
-main = putStrLn "idris: serial output online"
+main = runKernel
+

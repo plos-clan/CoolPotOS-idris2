@@ -18,6 +18,19 @@ pub fn write_str(message: &str) {
     }
 }
 
+pub fn write_hex_u64(value: u64) {
+    write_str("0x");
+
+    for shift in (0..16).rev() {
+        let nibble = ((value >> (shift * 4)) & 0xf) as u8;
+        let digit = match nibble {
+            0..=9 => b'0' + nibble,
+            _ => b'a' + (nibble - 10),
+        };
+        write_byte(digit);
+    }
+}
+
 /// # Safety
 /// Please be sure that message is a non-empty pointer, and that it ends with null.
 pub unsafe fn write_c_str(message: *const c_char) {

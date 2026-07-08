@@ -116,6 +116,7 @@ Value *idris2_sub_Integer(Value *lhs, Value *rhs);
 Value *idris2_cast_Integer_to_Int64(Value *value);
 
 extern Value_Int64 const idris2_predefined_Int64[100];
+extern Value_Bits64 const idris2_predefined_Bits64[100];
 extern Value_Integer const idris2_predefined_Integer[100];
 
 static inline uint8_t idris2_vp_to_Bits8(Value *value) {
@@ -194,8 +195,20 @@ static inline Value *idris2_add_Int64(Value *lhs, Value *rhs) {
   return idris2_mkInt64(idris2_vp_to_Int64(lhs) + idris2_vp_to_Int64(rhs));
 }
 
+static inline Value *idris2_add_Bits64(Value *lhs, Value *rhs) {
+  return idris2_mkBits64(idris2_vp_to_Bits64(lhs) + idris2_vp_to_Bits64(rhs));
+}
+
+static inline Value *idris2_and_Bits64(Value *lhs, Value *rhs) {
+  return idris2_mkBits64(idris2_vp_to_Bits64(lhs) & idris2_vp_to_Bits64(rhs));
+}
+
 static inline Value *idris2_eq_Int64(Value *lhs, Value *rhs) {
   return idris2_mkBool(idris2_vp_to_Int64(lhs) == idris2_vp_to_Int64(rhs));
+}
+
+static inline Value *idris2_eq_Bits64(Value *lhs, Value *rhs) {
+  return idris2_mkBool(idris2_vp_to_Bits64(lhs) == idris2_vp_to_Bits64(rhs));
 }
 
 static inline Value *idris2_eq_Integer(Value *lhs, Value *rhs) {

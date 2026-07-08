@@ -130,6 +130,13 @@ const fn int64_value(value: i64) -> ValueInt64 {
     }
 }
 
+const fn bits64_value(value: u64) -> ValueBits64 {
+    ValueBits64 {
+        header: immortal_header(BITS64_TAG),
+        ui64: value,
+    }
+}
+
 const fn integer_value(value: i64) -> ValueInteger {
     ValueInteger {
         header: immortal_header(INTEGER_TAG),
@@ -147,6 +154,16 @@ const fn build_predefined_int64() -> [ValueInt64; 100] {
     values
 }
 
+const fn build_predefined_bits64() -> [ValueBits64; 100] {
+    let mut values = [bits64_value(0); 100];
+    let mut index = 0;
+    while index < 100 {
+        values[index] = bits64_value(index as u64);
+        index += 1;
+    }
+    values
+}
+
 const fn build_predefined_integer() -> [ValueInteger; 100] {
     let mut values = [integer_value(0); 100];
     let mut index = 0;
@@ -159,6 +176,9 @@ const fn build_predefined_integer() -> [ValueInteger; 100] {
 
 #[unsafe(no_mangle)]
 pub static idris2_predefined_Int64: [ValueInt64; 100] = build_predefined_int64();
+
+#[unsafe(no_mangle)]
+pub static idris2_predefined_Bits64: [ValueBits64; 100] = build_predefined_bits64();
 
 #[unsafe(no_mangle)]
 pub static idris2_predefined_Integer: [ValueInteger; 100] = build_predefined_integer();
@@ -202,6 +222,18 @@ fn predefined_int64(value: i64) -> Option<*mut Value> {
     if (0..100).contains(&value) {
         Some(
             (&idris2_predefined_Int64[value as usize] as *const ValueInt64)
+                .cast_mut()
+                .cast(),
+        )
+    } else {
+        None
+    }
+}
+
+fn predefined_bits64(value: u64) -> Option<*mut Value> {
+    if value < 100 {
+        Some(
+            (&idris2_predefined_Bits64[value as usize] as *const ValueBits64)
                 .cast_mut()
                 .cast(),
         )
@@ -558,6 +590,10 @@ pub extern "C" fn idris2_mkClosure(f: RawClosureFn, arity: u8, filled: u8) -> *m
 
 #[unsafe(no_mangle)]
 pub extern "C" fn idris2_mkBits64(value: u64) -> *mut Value {
+    if let Some(predefined) = predefined_bits64(value) {
+        return predefined;
+    }
+
     let boxed = unsafe {
         alloc_boxed(ValueBits64 {
             header: heap_header(BITS64_TAG),
@@ -745,6 +781,26 @@ pub unsafe extern "C" fn idris2_extractInt(value: *mut Value) -> i64 {
             INTEGER_TAG => (*(value.cast::<ValueInteger>())).i,
             BITS64_TAG => (*(value.cast::<ValueBits64>())).ui64 as i64,
             DOUBLE_TAG => (*(value.cast::<ValueDouble>())).d as i64,
+            NO_TAG => 0,
+            _ => halt_forever(),
+        }
+    }
+}
+
+pub unsafe fn extract_bits64(value: *mut Value) -> u64 {
+    if value.is_null() {
+        return 0;
+    }
+
+    if is_unboxed(value) {
+        return value_as_i64(value) as u64;
+    }
+
+    unsafe {
+        match (*value).header.tag {
+            BITS64_TAG => (*(value.cast::<ValueBits64>())).ui64,
+            INT64_TAG => (*(value.cast::<ValueInt64>())).i64 as u64,
+            INTEGER_TAG => (*(value.cast::<ValueInteger>())).i as u64,
             NO_TAG => 0,
             _ => halt_forever(),
         }

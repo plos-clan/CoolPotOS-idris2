@@ -3,8 +3,8 @@
 mod allocator;
 mod idris2_runtime;
 pub mod serial;
+mod trap;
 
-use core::hint::spin_loop;
 use core::panic::PanicInfo;
 
 use idris2_runtime::{Value, idris2_removeReference, idris2_trampoline};
@@ -19,13 +19,13 @@ pub extern "C" fn kernel_entry() -> ! {
     unsafe { idris2_removeReference(result) };
 
     loop {
-        spin_loop();
+        core::hint::spin_loop();
     }
 }
 
 #[panic_handler]
 fn panic(_info: &PanicInfo<'_>) -> ! {
     loop {
-        spin_loop();
+        core::hint::spin_loop();
     }
 }
