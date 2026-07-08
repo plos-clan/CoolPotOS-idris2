@@ -18,6 +18,8 @@ pub fn write_str(message: &str) {
     }
 }
 
+/// # Safety
+/// Please be sure that message is a non-empty pointer, and that it ends with null.
 pub unsafe fn write_c_str(message: *const c_char) {
     if message.is_null() {
         return;

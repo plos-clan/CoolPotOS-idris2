@@ -202,14 +202,14 @@ fn resolve_clang() -> OsString {
         .output()
         .ok();
 
-    if let Some(output) = output {
-        if output.status.success() {
+    if let Some(output) = output 
+        && output.status.success() {
             let path = String::from_utf8_lossy(&output.stdout).trim().to_owned();
             if !path.is_empty() {
                 return OsString::from(path);
             }
         }
-    }
+    
 
     OsString::from("clang")
 }
